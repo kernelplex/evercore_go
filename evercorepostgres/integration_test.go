@@ -91,7 +91,7 @@ func TestPostgrtesDatastore(t *testing.T) {
 	defer evercorepostgres.MigrateDown(db)
 
 	iut := evercorepostgres.NewPostgresStorageEngine(db)
-	testSuite := sharedintegrationtests.NewStorageEngineTestSuite(iut)
+	testSuite := enginetests.NewStorageEngineTestSuite(iut)
 	testSuite.RunTests(t)
 }
 
