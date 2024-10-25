@@ -1,4 +1,4 @@
-package sharedintegrationtests
+package enginetests
 
 import (
 	"context"
