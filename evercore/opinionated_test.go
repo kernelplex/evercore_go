@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kernelplex/evercore_go/enginetests"
+	"github.com/kernelplex/evercore_go/evercore"
 )
 
 const (
