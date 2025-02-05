@@ -1,16 +1,18 @@
-package evercore
+package evercorememory
 
 import (
 	"context"
 	"fmt"
+
+	"github.com/kernelplex/evercore_go/evercore"
 )
 
 const maxKeyLength = 64
 
 // Ephemeral memory storage engine useful for testing without a database.
 type MemoryStorageEngine struct {
-	CapturedEvents    []StorageEngineEvent
-	CapturedSnapshots []Snapshot
+	CapturedEvents    []evercore.StorageEngineEvent
+	CapturedSnapshots []evercore.Snapshot
 
 	AggregateTypes     map[string]int64
 	AggregateTypesInv  map[int64]string
@@ -26,8 +28,8 @@ type MemoryStorageEngine struct {
 
 func NewMemoryStorageEngine() *MemoryStorageEngine {
 	return &MemoryStorageEngine{
-		CapturedEvents:    make([]StorageEngineEvent, 0),
-		CapturedSnapshots: make([]Snapshot, 0),
+		CapturedEvents:    make([]evercore.StorageEngineEvent, 0),
+		CapturedSnapshots: make([]evercore.Snapshot, 0),
 		AggregateTypes:    make(map[string]int64),
 		AggregateTypesInv: make(map[int64]string),
 		EventTypes:        make(map[string]int64),
@@ -51,13 +53,13 @@ func (tx MemoryStorageEngineTransaction) Rollback() error {
 	return nil
 }
 
-var memoryStorageEngine StorageEngine = NewMemoryStorageEngine()
+var memoryStorageEngine evercore.StorageEngine = NewMemoryStorageEngine()
 
 func (stor *MemoryStorageEngine) GetMaxKeyLength() int {
 	return maxKeyLength
 }
 
-func (stor *MemoryStorageEngine) GetTransactionInfo() (StorageEngineTxInfo, error) {
+func (stor *MemoryStorageEngine) GetTransactionInfo() (evercore.StorageEngineTxInfo, error) {
 	return MemoryStorageEngineTransaction{}, nil
 }
 
@@ -84,16 +86,16 @@ func (store *MemoryStorageEngine) GetAggregateTypeId(ctx context.Context, name s
 	return store.CountAggregateType, nil
 }
 
-func (store *MemoryStorageEngine) NewAggregate(tx StorageEngineTxInfo, ctx context.Context, aggregateTypeId int64) (int64, error) {
+func (store *MemoryStorageEngine) NewAggregate(tx evercore.StorageEngineTxInfo, ctx context.Context, aggregateTypeId int64) (int64, error) {
 	store.CountAggregates++
 	store.AggregateInv[store.CountAggregates] = nil
 	store.AggregateToTypeId[store.CountAggregates] = aggregateTypeId
 	return store.CountAggregates, nil
 }
 
-func (store *MemoryStorageEngine) NewAggregateWithKey(tx StorageEngineTxInfo, ctx context.Context, aggregateTypeId int64, naturalKey string) (int64, error) {
+func (store *MemoryStorageEngine) NewAggregateWithKey(tx evercore.StorageEngineTxInfo, ctx context.Context, aggregateTypeId int64, naturalKey string) (int64, error) {
 	if len(naturalKey) > maxKeyLength {
-		return 0, ErrorKeyExceedsMaximumLength
+		return 0, evercore.ErrorKeyExceedsMaximumLength
 	}
 	_, exists := store.Aggregates[naturalKey]
 	if exists {
@@ -129,10 +131,10 @@ func (store *MemoryStorageEngine) GetAggregateByKey(ctx context.Context, aggrega
 	return aggregateId, nil
 }
 
-func (store *MemoryStorageEngine) GetAggregateTypes(ctx context.Context) ([]IdNamePair, error) {
-	aggregateTypes := make([]IdNamePair, 0, len(store.AggregateTypes))
+func (store *MemoryStorageEngine) GetAggregateTypes(ctx context.Context) ([]evercore.IdNamePair, error) {
+	aggregateTypes := make([]evercore.IdNamePair, 0, len(store.AggregateTypes))
 	for name, id := range store.AggregateTypes {
-		current := IdNamePair{
+		current := evercore.IdNamePair{
 			Id:   id,
 			Name: name,
 		}
@@ -141,10 +143,10 @@ func (store *MemoryStorageEngine) GetAggregateTypes(ctx context.Context) ([]IdNa
 	return aggregateTypes, nil
 }
 
-func (store *MemoryStorageEngine) GetEventTypes(ctx context.Context) ([]IdNamePair, error) {
-	eventTypes := make([]IdNamePair, 0, len(store.EventTypes))
+func (store *MemoryStorageEngine) GetEventTypes(ctx context.Context) ([]evercore.IdNamePair, error) {
+	eventTypes := make([]evercore.IdNamePair, 0, len(store.EventTypes))
 	for name, id := range store.EventTypes {
-		current := IdNamePair{
+		current := evercore.IdNamePair{
 			Id:   id,
 			Name: name,
 		}
@@ -153,7 +155,7 @@ func (store *MemoryStorageEngine) GetEventTypes(ctx context.Context) ([]IdNamePa
 	return eventTypes, nil
 }
 
-func (store *MemoryStorageEngine) GetSnapshotForAggregate(ctx context.Context, aggregateId int64) (*Snapshot, error) {
+func (store *MemoryStorageEngine) GetSnapshotForAggregate(ctx context.Context, aggregateId int64) (*evercore.Snapshot, error) {
 	for i := len(store.CapturedSnapshots) - 1; i >= 0; i-- {
 		if store.CapturedSnapshots[i].AggregateId == aggregateId {
 			return &store.CapturedSnapshots[i], nil
@@ -162,11 +164,11 @@ func (store *MemoryStorageEngine) GetSnapshotForAggregate(ctx context.Context, a
 	return nil, nil
 }
 
-func (store *MemoryStorageEngine) GetEventsForAggregate(ctx context.Context, aggregateId int64, afterSequence int64) ([]SerializedEvent, error) {
-	aggregateEvents := make([]SerializedEvent, 0, 10)
+func (store *MemoryStorageEngine) GetEventsForAggregate(ctx context.Context, aggregateId int64, afterSequence int64) ([]evercore.SerializedEvent, error) {
+	aggregateEvents := make([]evercore.SerializedEvent, 0, 10)
 	for _, storageEvent := range store.CapturedEvents {
 		if storageEvent.AggregateID == aggregateId && storageEvent.Sequence > afterSequence {
-			event := SerializedEvent{
+			event := evercore.SerializedEvent{
 				AggregateId: aggregateId,
 				EventType:   store.EventTypesInv[storageEvent.EventTypeID],
 				Sequence:    storageEvent.Sequence,
@@ -180,7 +182,7 @@ func (store *MemoryStorageEngine) GetEventsForAggregate(ctx context.Context, agg
 	return aggregateEvents, nil
 }
 
-func (store *MemoryStorageEngine) WriteState(tx StorageEngineTxInfo, ctx context.Context, events []StorageEngineEvent, snapshot SnapshotSlice) error {
+func (store *MemoryStorageEngine) WriteState(tx evercore.StorageEngineTxInfo, ctx context.Context, events []evercore.StorageEngineEvent, snapshot evercore.SnapshotSlice) error {
 	store.CapturedEvents = append(store.CapturedEvents, events...)
 	store.CapturedSnapshots = append(store.CapturedSnapshots, snapshot...)
 	return nil
