@@ -5,6 +5,8 @@ go 1.23.1
 require (
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/joho/godotenv v1.5.1
+	github.com/kernelplex/evercore_go/evercore v0.0.4
+	github.com/kernelplex/evercore_go/evercoreenginetests v0.0.4
 	github.com/pressly/goose/v3 v3.22.1
 )
 
