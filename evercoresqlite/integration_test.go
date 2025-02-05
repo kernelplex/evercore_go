@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/kernelplex/evercore_go/enginetests"
+	"github.com/kernelplex/evercore_go/evercoreenginetests"
 	"github.com/kernelplex/evercore_go/evercoresqlite"
 	_ "github.com/mattn/go-sqlite3"
 )

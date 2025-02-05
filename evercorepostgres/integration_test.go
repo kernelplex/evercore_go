@@ -12,7 +12,7 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
-	"github.com/kernelplex/evercore_go/enginetests"
+	"github.com/kernelplex/evercore_go/evercoreenginetests"
 	"github.com/kernelplex/evercore_go/evercorepostgres"
 	"github.com/pressly/goose/v3"
 )
