@@ -3,8 +3,8 @@ module github.com/kernelplex/evercore_go/evercoresqlite
 go 1.23.1
 
 require (
-	github.com/kernelplex/evercore_go/evercore v0.0.4
-	github.com/kernelplex/evercore_go/evercoreenginetests v0.0.4
+	github.com/kernelplex/evercore_go/evercore v0.0.0-20250205050757-6501af374194
+	github.com/kernelplex/evercore_go/evercoreenginetests v0.0.0-20250205050757-6501af374194
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/pressly/goose/v3 v3.22.1
 )
